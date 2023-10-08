@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "30860858253",
+    "project_id": "swift-talk-co-ab21a",
+    "storage_bucket": "swift-talk-co-ab21a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:30860858253:android:c7806a59197658ddfa23c4",
+        "android_client_info": {
+          "package_name": "abdullah.co.pk.swift_talk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0ZFxTjOX62Qam5YvAuyjFaftUgSl49bo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
