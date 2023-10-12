@@ -2,9 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:swift_talk/Constants/constants.dart';
 import 'package:swift_talk/Services/database.dart';
 import 'package:swift_talk/main.dart';
 import 'package:swift_talk/Models/user.dart';
@@ -40,25 +37,6 @@ class Auth_Service {
     }
   }
 
-  // //Sign Up using EMAIL & PASSWORD
-  // Future signUpWithEmailAndPassword(String email, String password) async {
-  //   try {
-  //     UserCredential result = await _auth.createUserWithEmailAndPassword(
-  //         email: email, password: password);
-  //     User? user = result.user;
-  //     //Create a new Record of User in DataBase
-  //     File imageFile = await copyAssetToFile('assets/images/add_photo.jpg', 'path_in_local_file_system.jpg');
-  //     await DataBase_Service(uid: user!.uid).updateUserData('name', '03001234567',email,  password, 'Available', 'Hey there, Lets talk swiftly', imageFile);
-  //     return _userFromFirebaseUser(user!);
-  //   } catch (e) {
-  //     log('Error Signing Up User $e');
-  //     var errorMessage = e.toString().replaceAll(RegExp(r'\[.*?\]'), '');
-  //     Global_error = errorMessage;
-  //     return null;
-  //   }
-  // }
-
-  //Sign Up using EMAIL & PASSWORD
   Future signUpWithEmailAndPassword(String email, String password) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
@@ -80,7 +58,6 @@ class Auth_Service {
           imageFile,
         );
 
-      print('update status $updateSuccess');
       if (updateSuccess) {
         return _userFromFirebaseUser(user);
       } else {

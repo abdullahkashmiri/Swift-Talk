@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:swift_talk/Models/user.dart';
-import 'package:swift_talk/Screens/Profile/Contacts_known/my_contacts.dart';
-import 'package:swift_talk/Screens/Profile/profile.dart';
 import 'package:swift_talk/Screens/Splash/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:swift_talk/Services/auth.dart';

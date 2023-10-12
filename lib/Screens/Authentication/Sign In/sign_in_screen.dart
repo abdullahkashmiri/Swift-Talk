@@ -19,7 +19,6 @@ class _SignIn_ScreenState extends State<SignIn_Screen> {
   TextEditingController _passwordController = TextEditingController();
 
   final Auth_Service _auth = Auth_Service();
-  final _formKey = GlobalKey<FormState>();
   String email = '';
   String password = '';
   String error = '';

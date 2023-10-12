@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:swift_talk/Screens/Loading/loading_Screen.dart';
 import 'package:swift_talk/Services/database.dart';
-import 'package:swift_talk/Services/database.dart';
 import '../../../Models/user.dart';
 class Phone_Directory_Screen extends StatefulWidget {
   const Phone_Directory_Screen({Key? key}) : super(key: key);
@@ -26,7 +25,6 @@ class _Phone_Directory_ScreenState extends State<Phone_Directory_Screen> {
       // Check if the phone number already exists
       return !allPhoneNumbers.contains(phoneNumber);
     } catch (e) {
-      print('Error checking phone number uniqueness: $e');
       return false; // Return false in case of an error
     }
   }
@@ -36,7 +34,6 @@ class _Phone_Directory_ScreenState extends State<Phone_Directory_Screen> {
     bool isPhoneNumberUnique = await isUniquePhoneNumber(phoneNumberController.text, user.uid);
     if (!isPhoneNumberUnique) {
       // Handle the case where the phone number is not unique
-      print('Phone number is not unique.');
       setState(() {
         error = 'Phone number already registered.';
       });
@@ -103,7 +100,7 @@ class _Phone_Directory_ScreenState extends State<Phone_Directory_Screen> {
                                     isUploading = true;
                                   });
                                   // Delete the phone number
-                                  await DataBase_Service(uid: user.uid!)
+                                  await DataBase_Service(uid: user.uid)
                                       .deletePhoneNumber(phoneNumber);
                                   setState(() {
                                     isUploading = false;
@@ -137,7 +134,7 @@ class _Phone_Directory_ScreenState extends State<Phone_Directory_Screen> {
                                   // Add the phone number
                                   if (phoneNumberController.text.isNotEmpty) {
                                     if (await isNumberAlreadyExists(user) == true) {
-                                      await DataBase_Service(uid: user.uid!)
+                                      await DataBase_Service(uid: user.uid)
                                           .addPhoneNumber(phoneNumberController.text);
                                       phoneNumberController.clear();
                                     }
