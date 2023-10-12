@@ -1,8 +1,5 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:swift_talk/Screens/Authentication/Sign Up/sign_up_screen.dart';
-import 'package:swift_talk/Screens/Authentication/Sign%20In/sign_in_screen.dart';
 import 'package:swift_talk/Screens/Wrapper.dart';
 
 class Splash_Screen extends StatefulWidget {

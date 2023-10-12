@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:swift_talk/Screens/Contact%20List/all_contacts.dart';
 import 'package:swift_talk/Screens/Contact_Profile/Contact_Profile.dart';
 import 'package:swift_talk/Screens/Loading/loading_Screen.dart';
-import 'package:swift_talk/Screens/Profile/Contacts_known/my_contacts.dart';
 import 'package:swift_talk/Services/database.dart';
 import '../../Models/user.dart';
 
@@ -33,7 +32,7 @@ class _Contact_List_ScreenState extends State<Contact_List_Screen> {
         actions: [
           IconButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
                   return All_Contact_List_Screen();
                 }));
               },
@@ -47,12 +46,16 @@ class _Contact_List_ScreenState extends State<Contact_List_Screen> {
             return Loading_Screen(); // Return a loading indicator while waiting for data
           }
           if (snapshot.hasError) {
-            print('Error: ${snapshot.error}');
             return Loading_Screen(); // Handle error by showing a loading indicator for now
           }
 
           List<String>? userPhoneNumbers = snapshot.data;
 
+          if (userPhoneNumbers == null || userPhoneNumbers.isEmpty) {
+            return Center(child: Text('No Contacts Found!\nAdd Contacts or Browse Directory.',
+            style: TextStyle(color: Colors.blue, fontSize: 16.0),
+            textAlign: TextAlign.center,));
+          }
           return StreamBuilder<List<UserData>>(
             stream: DataBase_Service(uid: Cuser.uid).allUserAccounts,
             builder: (context, snapshot) {
@@ -60,7 +63,6 @@ class _Contact_List_ScreenState extends State<Contact_List_Screen> {
                 return Loading_Screen(); // Return a loading indicator while waiting for data
               }
               if (snapshot.hasError) {
-                print('Error: ${snapshot.error}');
                 return Loading_Screen(); // Handle error by showing a loading indicator for now
               }
               if (snapshot.hasData && snapshot.data != null) {
@@ -79,11 +81,11 @@ class _Contact_List_ScreenState extends State<Contact_List_Screen> {
                 return ListView.builder(
                   itemBuilder: (context, index) {
                     UserData? userData = userDataList![index];
-                    return InkWell(
+                    if(userData.Phone != '')
+                      return InkWell(
                       onTap: () {
-                        print('Name : ' + userData.name);
                         Navigator.push(context, MaterialPageRoute(builder: (context) {
-                          return Contact_Profile_Screen(uid: userData.uid);
+                          return Contact_Profile_Screen(uid: userData.uid, id: 0,);// 0 as default to start chat
                         }));
                       },
                       child: Card(
@@ -92,25 +94,25 @@ class _Contact_List_ScreenState extends State<Contact_List_Screen> {
                             vertical: 10, horizontal: 15),
                         child: ListTile(
                           title: Text(
-                            userData.name ?? 'No Name',
+                            userData.name,
                             style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
-                            userData.Status ?? 'No Status',
+                            userData.Status,
                             style: TextStyle(color: Colors.grey),
                           ),
                           leading: CircleAvatar(
                             radius: 30,
                             backgroundImage: NetworkImage(
-                              userData?.profilePic ??
-                                  'https://firebasestorage.googleapis.com/v0/b/swift-talk-co-ab21a.appspot.com/o/Default%2Fprofile_default.png?alt=media&token=473d6feb-a748-490b-9841-3f56ccee7dcb&_gl=1*1rol94l*_ga*NjEwMDgxNjQzLjE2OTQ1MDY4NzY.*_ga_CW55HF8NVT*MTY5NjgwMjI3NC40Mi4xLjE2OTY4MDIzOTMuMTMuMC4w',
+                              userData.profilePic,
                             ),
                             backgroundColor: Colors.transparent,
                           ),
                         ),
                       ),
                     );
+                    return null;
                   },
                   itemCount: userDataList?.length ?? 0,
                 );

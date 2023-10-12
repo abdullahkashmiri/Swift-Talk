@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -36,6 +34,11 @@ class _Profile_ScreenState extends State<Profile_Screen> {
   bool initializeDone = false;
   bool profileUpdated = false;
   String error = '';
+  late String initillizeName;
+  late String initillizeAboutMe;
+  late String initillizePhone;
+  late File initillizeProfilePic;
+  late String initillizeStatus;
   //Functions
 
   Future<bool> saveData(UserData userData, Current_User user) async {
@@ -44,7 +47,6 @@ class _Profile_ScreenState extends State<Profile_Screen> {
 
     if (!isPhoneNumberUnique) {
       // Handle the case where the phone number is not unique
-      print('Phone number is not unique.');
       setState(() {
         error = 'Phone number already registered.';
       });
@@ -52,27 +54,23 @@ class _Profile_ScreenState extends State<Profile_Screen> {
     }
 
     if (profilepic == null || profileUpdated == false) {
-      print('if without pic');
       await DataBase_Service(uid: user.uid).updateUserDataWithoutPic(
         nameController.text,
         phoneController.text,
-        userData!.email,
-        userData!.password,
+        userData.email,
+        userData.password,
         currentStatus,
         aboutMeController.text,
-        userData.profilePic ?? '',
+        userData.profilePic,
       );
     } else {
-      print('else with pic');
-      if (userData.profilePic != null && userData.profilePic.isNotEmpty) {
-        print('\n\n\n\n\n\n\n');
+      if (userData.profilePic.isNotEmpty) {
         try {
           // Assuming userUid is the UID of the user whose profile picture you want to delete
           String userUid = userData.uid; // Replace with the actual user's UID
           await DataBase_Service(uid: userUid).deleteProfilePictures(userUid);
-          print('Old profile pictures for user $userUid deleted successfully.');
         } catch (e) {
-          print('Error deleting old profile pictures: $e');
+          Text('Error deleting old profile pictures: $e');
           // Add more detailed error handling here, log the error, etc.
         }
       }
@@ -80,8 +78,8 @@ class _Profile_ScreenState extends State<Profile_Screen> {
       await DataBase_Service(uid: user.uid).updateUserData(
           nameController.text,
           phoneController.text,
-          userData!.email,
-          userData!.password,
+          userData.email,
+          userData.password,
           currentStatus,
           aboutMeController.text,
           profilepic!
@@ -97,11 +95,12 @@ class _Profile_ScreenState extends State<Profile_Screen> {
     try {
       // Fetch all user accounts
       List<UserData> allUsers = await DataBase_Service(uid: currentUserId).allUserAccounts.first;
-
+      //Excluding current user's account on user right now
+      allUsers.removeWhere((user) => user.uid == currentUserId);
       // Check if the phone number already exists
       return !allUsers.any((user) => user.Phone == phoneNumber);
     } catch (e) {
-      print('Error checking phone number uniqueness: $e');
+      Text('Error checking phone number uniqueness: $e');
       return false; // Return false in case of an error
     }
   }
@@ -122,26 +121,28 @@ class _Profile_ScreenState extends State<Profile_Screen> {
       });
     } else {
       // Handle error
-      print("Failed to download image. Status code: ${response.statusCode}");
+      Text("Failed to download image. Status code: ${response.statusCode}");
     }
   }
 
   Future<void> initializeData(UserData? userData) async {
-    print('in function');
     if (userData != null && _dataFetched == false) {
-      print('in function if');
-
       if(initializeDone == false) {
         // Show loading screen
-        nameController.text = userData.name ?? '';
-        emailController.text = userData.email ?? '';
-        phoneController.text = userData.Phone ?? '';
-        aboutMeController.text = userData.AboutMe ?? '';
+        nameController.text = userData.name;
+        emailController.text = userData.email;
+        phoneController.text = userData.Phone;
+        aboutMeController.text = userData.AboutMe;
         profilepic = null;
-
         await downloadAndSaveImage(userData.profilePic);
-        print('after download ' + userData.profilePic);
-        currentStatus = userData?.Status ?? 'Available';
+        currentStatus = userData.Status;
+
+        // initillizing values used to check if user has not updated anything
+        initillizeName = userData.name;
+        initillizeAboutMe = userData.AboutMe;
+        initillizePhone = userData.Phone;
+        initillizeProfilePic = profilepic!;
+        initillizeStatus = userData.Status;
       }
       initializeDone = true;
       // Introduce a delay of 2 seconds
@@ -182,13 +183,12 @@ class _Profile_ScreenState extends State<Profile_Screen> {
                               if (selectedImage != null) {
                                 log('Image selected');
                                 File convertedFile = File(selectedImage.path);
+                                // ignore: unnecessary_null_comparison
                                 if (convertedFile != null) {
                                   setState(() {
                                     profilepic = convertedFile;
                                   });
                                   profileUpdated = true;
-                                  print(
-                                      'image updated in profile pic variable');
                                 } else {
                                   log('Selected image file does not exist.');
                                 }
@@ -303,11 +303,9 @@ class _Profile_ScreenState extends State<Profile_Screen> {
                         StatusDropdown(
                             initialStatus: currentStatus, onStatusChanged: (
                             newStatus) {
-                          print('before: $currentStatus');
                           setState(() {
                             currentStatus = newStatus;
                           });
-                          print('after: $currentStatus');
                         }),
                         SizedBox(height: 10.0,),
                         ElevatedButton(
@@ -316,17 +314,21 @@ class _Profile_ScreenState extends State<Profile_Screen> {
                               setState(() {
                                 _savingData = true; // Set loading state to false after saving data
                               });
-                              if(await saveData(userData!, user) == true) {
+                              if(initillizeName != nameController.text.trim() || initillizeAboutMe != aboutMeController.text.trim()
+                              || initillizePhone != phoneController.text.trim() || initillizeStatus != currentStatus
+                              || initillizeProfilePic != profilepic) {
+                                if (await saveData(userData!, user) == true) {
+                                  Navigator.pop(context);
+                                }
+                              }  else { // nothing updated
                                 Navigator.pop(context);
                               }
-                              await Future.delayed(Duration(milliseconds: 500));
-                              setState(() {
+                               setState(() {
                                 _savingData = false; // Set loading state to false after saving data
                               });
                             } else {
                               // Handle the case where profilepic is null
-                              print(
-                                  'Profile picture is null. Update not performed.');
+                              Text('Profile picture is null. Update not performed.');
                             }
                           },
                           child: Text(

@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:swift_talk/Screens/Chat List/chat_list.dart';
 import 'package:swift_talk/Screens/Loading/loading_Screen.dart';
 import 'package:swift_talk/Services/auth.dart';
 import 'package:swift_talk/main.dart';
@@ -19,7 +18,6 @@ class _SignUp_ScreenState extends State<SignUp_Screen> {
   TextEditingController _cPasswordController = TextEditingController();
 
   final Auth_Service _auth = Auth_Service();
-  final _formKey = GlobalKey<FormState>();
   String email = '';
   String password = '';
   String cPassword = '';
@@ -158,7 +156,6 @@ class _SignUp_ScreenState extends State<SignUp_Screen> {
                             isSigningUp = false;
                           });
 
-                          print('Sign up Result: $result');
 
                           if (result == null) {
                             setState(() {
@@ -174,7 +171,6 @@ class _SignUp_ScreenState extends State<SignUp_Screen> {
                             _passwordController.clear();
                             _cPasswordController.clear();
 
-                            print('Sign Up');
                             Navigator.pop(context);
                           }
                         }
