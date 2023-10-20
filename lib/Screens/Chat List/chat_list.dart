@@ -198,8 +198,6 @@ class _Chat_ListState extends State<Chat_List> {
                                 },
                               ),
                             );
-
-
                           },
                         );
                       } else {
@@ -210,9 +208,6 @@ class _Chat_ListState extends State<Chat_List> {
                     }
                   },
                 ),
-
-
-
               ),
             ),
             // Centered container
