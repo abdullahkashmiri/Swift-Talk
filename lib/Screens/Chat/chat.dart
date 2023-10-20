@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,7 +9,6 @@ import 'package:swift_talk/Models/user.dart';
 import 'package:swift_talk/Screens/Contact_Profile/Contact_Profile.dart';
 import 'package:swift_talk/Screens/Loading/loading_Screen.dart';
 import 'package:swift_talk/Services/database.dart';
-
 
 // ignore: must_be_immutable
 class Chat_Screen extends StatefulWidget {
@@ -157,9 +155,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                       chatUserData!.profilePic),
                                   radius: 17,
                                 ),
-
                               ],
-
                             ),
                           ),
                           actions: [
@@ -333,7 +329,6 @@ class _Chat_WidgetState extends State<Chat_Widget> {
       lastMessageIdSd = lastMessageId;
       lastMessageDocSd = lastMessageDoc;
       replyingMessageText = messageText;
-      print('data updated');
       return true;
     } catch (e) {
       print('Error in storing data for delete: $e');
@@ -489,13 +484,13 @@ class _Chat_WidgetState extends State<Chat_Widget> {
                               var replyMessageSentAt = replyMessage['sentAt'];
                               var replyMessageText = replyMessage['text'];
                               var replyImageUrl = replyMessage['image'];
-                              var replyIsImageExist = replyMessage['isImageExist'];
+                              bool replyIsImageExist = replyMessage['isImageExist']  ?? false;
 
-                              print(messageText);
-                              print(imageUrl);
+                               print(replyIsImageExist);
                               isMessageReplied = false; // checking if there is any reply of text or not
                               var replyUserName = '';
-                              if (replyMessageText != '') {
+
+                              if (replyMessageText != '' || replyIsImageExist) {
                                 // there exists a reply in this text then show in chat screen
                                 isMessageReplied = true;
                                 if (replyMessageSenderId ==
@@ -544,7 +539,6 @@ class _Chat_WidgetState extends State<Chat_Widget> {
                                       'image': documents[index]['image'],
                                       'isImageExist': documents[index]['isImageExist'],
                                     };
-                                    print('index updated at $index');
                                     isLastMessageFound = false;
                                   }
 
@@ -582,7 +576,6 @@ class _Chat_WidgetState extends State<Chat_Widget> {
                                                 setState(() {
                                                   showSecondDialogsIcons = true;
                                                 });
-                                                print('onLongPress');
                                               },
                                               child: Container(
                                                 padding: EdgeInsets.all(8.0),
@@ -753,7 +746,6 @@ class _Chat_WidgetState extends State<Chat_Widget> {
                                                   ),
                                                 ),
                                               ),
-
                                             ),
                                           ],
                                         ),
@@ -1118,8 +1110,19 @@ class _Chat_WidgetState extends State<Chat_Widget> {
           });
     } else if(isLoading) {
       return Loading_Screen();
-    } else {
-      return Container(
+    } else if(isImageSelected == true) {
+      return WillPopScope(
+              onWillPop: () async {
+                if (isMessageReplying == true || isImageSelected == true) {
+                  setState(() {
+                    isMessageReplying = false;
+                    isImageSelected = false;
+                  });
+                  return false;
+                } else {
+                  return true;
+                }
+              },
         child: Column(
           children: [
             Expanded(
@@ -1270,6 +1273,8 @@ class _Chat_WidgetState extends State<Chat_Widget> {
           ],
         )
       );
+    } else {
+      return Loading_Screen();
     }
   }
 }
